@@ -19,3 +19,7 @@ When creating a new index "products", elasticsearch will warn us that, we are in
 ## Analyzer 
 
 ![img.png](images/img.png)
+
+## How Elasticsearch fits in the application architecture
+
+![img.png](images/img-architecture.png)
