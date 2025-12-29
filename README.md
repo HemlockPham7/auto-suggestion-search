@@ -15,3 +15,11 @@ When creating a new index "products", elasticsearch will warn us that, we are in
 
 - Maxn number of documents per shard is 2.1 Billion
 - A shard can handle 25 - 50GB
+
+## Analyzer 
+
+![img.png](images/img.png)
+
+## How Elasticsearch fits in the application architecture
+
+![img.png](images/img-architecture.png)
