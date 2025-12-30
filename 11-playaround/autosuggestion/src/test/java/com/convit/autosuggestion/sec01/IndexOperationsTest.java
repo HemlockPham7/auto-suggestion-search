@@ -1,6 +1,8 @@
 package com.convit.autosuggestion.sec01;
 
 import com.convit.autosuggestion.AbstractTest;
+import com.convit.autosuggestion.sec01.entity.Customer;
+import com.convit.autosuggestion.sec01.entity.Movie;
 import com.convit.autosuggestion.sec01.entity.Review;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -28,6 +30,20 @@ public class IndexOperationsTest extends AbstractTest {
         var indexOperations = this.elasticsearchOperations.indexOps(Review.class);
         Assertions.assertTrue(indexOperations.create());
         this.verify(indexOperations, 2, 2);
+    }
+
+    @Test
+    public void createIndexWithSettingsAndMappings(){
+        var indexOperations = this.elasticsearchOperations.indexOps(Customer.class);
+        Assertions.assertTrue(indexOperations.createWithMapping());
+        this.verify(indexOperations, 3, 0);
+    }
+
+    @Test
+    public void createIndexWithFieldMappings(){
+        var indexOperations = this.elasticsearchOperations.indexOps(Movie.class);
+        Assertions.assertTrue(indexOperations.createWithMapping());
+        this.verify(indexOperations, 1, 1);
     }
 
     private void verify(IndexOperations indexOperations, int expectedShards, int expectedReplicas){
