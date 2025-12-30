@@ -1,0 +1,89 @@
+package com.convit.autosuggestion.sec02;
+
+import com.convit.autosuggestion.AbstractTest;
+import com.convit.autosuggestion.sec02.entity.Employee;
+import com.convit.autosuggestion.sec02.repository.EmployeeRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Streamable;
+
+import java.util.List;
+import java.util.stream.IntStream;
+
+@Slf4j
+public class CrudOperationsTest extends AbstractTest {
+
+    @Autowired
+    private EmployeeRepository repository;
+
+    @Test
+    public void crud() {
+        var employee = this.createEmployee(1, "sam", 30);
+
+        // save
+        this.repository.save(employee);
+        this.printAll();
+
+        // find by id
+        employee = this.repository.findById(1).orElseThrow();
+        Assertions.assertEquals(30, employee.getAge());
+        Assertions.assertEquals("sam", employee.getName());
+
+        // update and save
+        employee.setAge(32);
+        employee = this.repository.save(employee);
+        this.printAll();
+        Assertions.assertEquals(32, employee.getAge());
+
+        // delete
+        this.repository.deleteById(1);
+        this.printAll();
+        Assertions.assertTrue(this.repository.findById(1).isEmpty());
+    }
+
+    @Test
+    public void bulkCrud(){
+
+        var list = IntStream.rangeClosed(1, 10)
+                .mapToObj(i -> this.createEmployee(i, "name-" + i, 30 + i))
+                .toList();
+        this.repository.saveAll(list);
+        this.printAll();
+
+        // check the count
+        Assertions.assertEquals(10, this.repository.count());
+
+        // find by ids
+        var ids = List.of(2, 4, 6);
+        var iterable = this.repository.findAllById(ids);
+        list = Streamable.of(iterable).toList();
+        Assertions.assertEquals(3, list.size());
+
+        // update and save
+        list.forEach(e -> e.setAge(e.getAge() + 10)); // mutable object
+        this.repository.saveAll(list);
+        this.printAll();
+        this.repository.findAllById(ids)
+                .forEach(e -> Assertions.assertEquals(e.getId() + 40, e.getAge()));
+
+        // delete and check the count
+        this.repository.deleteAllById(ids);
+        this.printAll();
+        Assertions.assertEquals(7, this.repository.count());
+    }
+
+    private Employee createEmployee(int id, String name, int age){
+        return Employee.builder()
+                .id(id)
+                .name(name)
+                .age(age)
+                .build();
+    }
+
+    private void printAll(){
+        this.repository.findAll()
+                .forEach(e -> log.info("employee: {}", e));
+    }
+}
